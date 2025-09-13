@@ -1,10 +1,9 @@
-from typing import Literal
 from langgraph.graph import StateGraph, END
 from agents import agent0_validator, agent1_extractor
 from src.graph.state import AgentState
 
 
-def should_continue(state: AgentState) -> Literal["extractor", END]:
+def should_continue(state):
     """
     Determines whether to continue to the extractor node or end the workflow.
 

@@ -8,7 +8,7 @@ class ResumeProcessingWorkflow:
     def __init__(self):
         self.workflow = create_workflow()
 
-    def process_resume(self, file_path: str):
+    def process_resume(self, file_path):
         """
         Process a resume file through the complete workflow.
 
