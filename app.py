@@ -20,6 +20,12 @@ def main():
     Загрузите ваше резюме (PDF или DOCX) и система извлечет ключевую информацию в структурированном формате.
     """)
 
+    # Инициализация session state
+    if 'processing_result' not in st.session_state:
+        st.session_state.processing_result = None
+    if 'current_file_name' not in st.session_state:
+        st.session_state.current_file_name = None
+
     # Загрузка файла
     uploaded_file = st.file_uploader(
         "Загрузите файл резюме",
@@ -27,70 +33,78 @@ def main():
         help="Поддерживаемые форматы: PDF, DOC, DOCX"
     )
 
+    # Проверяем, был ли загружен новый файл
     if uploaded_file is not None:
-        # Сохранение загруженного файла временно
-        with st.spinner("Обработка файла..."):
-            # Создаем временную директорию
-            os.makedirs("temp_uploads", exist_ok=True)
+        # Если файл изменился, сбрасываем результаты и обрабатываем заново
+        if st.session_state.current_file_name != uploaded_file.name:
+            st.session_state.current_file_name = uploaded_file.name
+            st.session_state.processing_result = None
 
-            # Сохраняем файл
-            file_path = os.path.join("temp_uploads", uploaded_file.name)
-            with open(file_path, "wb") as f:
-                f.write(uploaded_file.getbuffer())
+            # Сохранение загруженного файла временно
+            with st.spinner("Обработка файла..."):
+                # Создаем временную директорию
+                os.makedirs("temp_uploads", exist_ok=True)
 
-            # Обрабатываем резюме
-            workflow = ResumeProcessingWorkflow()
-            result = workflow.process_resume(file_path)
+                # Сохраняем файл
+                file_path = os.path.join("temp_uploads", uploaded_file.name)
+                with open(file_path, "wb") as f:
+                    f.write(uploaded_file.getbuffer())
 
-            pprint.pprint(result)
+                # Обрабатываем резюме
+                workflow = ResumeProcessingWorkflow()
+                result = workflow.process_resume(file_path)
 
-            # Очистка
-            os.remove(file_path)
+                # Сохраняем результат в session state
+                st.session_state.processing_result = result
 
-            # Отображение результатов
-            if result.get("error"):
-                st.error(f"❌ Ошибка: {result['error']}")
+                # Очистка
+                os.remove(file_path)
 
-                # Проверка на проблемы с API
-                if "API" in result["error"]:
-                    st.warning("""
-                    **Вероятная причина:** Проблема с API-ключом
+                # Для отладки (можно убрать в production)
+                # st.write("Результат обработки сохранен в session_state")
+        else:
+            # Используем уже обработанные данные
+            result = st.session_state.processing_result
+    else:
+        # Сбрасываем состояние при удалении файла
+        st.session_state.current_file_name = None
+        st.session_state.processing_result = None
 
-                    Comet API блокирует запросы с сообщением: "Sorry, you have been blocked"
-                    OpenRouter возвращает ошибку: "The model 'api/v1' is not available"
+    # Отображаем результаты, если они есть
+    if st.session_state.processing_result is not None:
+        result = st.session_state.processing_result
 
-                    **Решение:**
-                    1. Для Comet: свяжитесь с поддержкой для снятия блокировки
-                    2. Для OpenRouter: раскомментируйте соответствующие строки в llmclient.py
-                       и укажите правильное имя модели (например, "qwen/qwen-2.5-72b-instruct")
-                    """)
-            else:
-                st.success("✅ Резюме успешно обработано!")
+        # Отображение результатов
+        if result.get("error"):
+            st.error(f"❌ Ошибка: {result['error']}")
 
-                # Показ результатов валидации
-                if result.get("validation_result"):
-                    validation = result["validation_result"]
-                    st.subheader("🔍 Результаты валидации")
+            # Проверка на проблемы с API
+            if "API" in result["error"]:
+                st.warning("""
+                **Вероятная причина:** Проблема с API-ключом
 
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        st.metric("Это резюме?", "Да" if validation["is_resume"] else "Нет",
-                                  delta=f"Уверенность, в том что файл - резюме: {validation['confidence']:.2f}")
-                        # st.write(f"**Формат:** {validation['primary_format']}")
-                        # st.write(f"**Рекомендуемое действие:** {validation['suggested_action']}")
+                Comet API блокирует запросы с сообщением: "Sorry, you have been blocked"
+                OpenRouter возвращает ошибку: "The model 'api/v1' is not available"
 
-                    # with col2:
-                    #     st.write("**Обоснование:**")
-                    #     st.write(validation["explain"])
-                    #
-                    #     st.write("**Пример фрагмента:**")
-                    #     st.text(validation["excerpt"])
+                **Решение:**
+                1. Для Comet: свяжитесь с поддержкой для снятия блокировки
+                2. Для OpenRouter: раскомментируйте соответствующие строки в llmclient.py
+                   и укажите правильное имя модели (например, "qwen/qwen-2.5-72b-instruct")
+                """)
+        else:
+            st.success("✅ Резюме успешно обработано!")
 
-                    # Показ доказательств
-                    # st.write("**Доказательства:**")
-                    # for i, evidence in enumerate(validation["evidence"]):
-                    #     with st.expander(f"Доказательство #{i + 1} - {evidence['reason']}"):
-                    #         st.text(evidence["text_excerpt"])
+            # Показ результатов валидации
+            if result.get("validation_result"):
+                validation = result["validation_result"]
+                st.subheader("🔍 Результаты валидации")
+
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.metric("Это резюме?", "Да" if validation["is_resume"] else "Нет",
+                              delta=f"Уверенность, в том что файл - резюме: {validation['confidence']:.2f}")
+                    # st.write(f"**Формат:** {validation['primary_format']}")
+                    # st.write(f"**Рекомендуемое действие:** {validation['suggested_action']}")
 
                 # Показ результатов извлечения, если это резюме
                 if result.get("extraction_result") and result.get("validation_result", {}).get("is_resume", False):
@@ -170,45 +184,45 @@ def main():
                     if extraction["additional_information"]:
                         st.markdown("### ℹ️ Additional information")
                         st.write(extraction["additional_information"])
-                    #
-                    # st.markdown("---")
-                    # st.subheader("📥 Скачать результаты")
-                    #
-                    # # Подготовка данных для скачивания
-                    # full_results = {
-                    #     "metadata": {
-                    #         "processed_at": str(datetime.time()),
-                    #         "file_name": os.path.basename(file_path),
-                    #         "file_size": f"{len(result['file_content'])} символов"
-                    #     },
-                    #     "validation": result["validation_result"],
-                    #     "extraction": result["extraction_result"]
-                    # }
-                    #
-                    # # Конвертируем в JSON
-                    # json_data = json.dumps(full_results, indent=2, ensure_ascii=False)
-                    #
-                    # # Кнопка для скачивания полных результатов
-                    # st.download_button(
-                    #     label="Скачать полные результаты (JSON)",
-                    #     data=json_data,
-                    #     file_name=f"resume_results_{int(time.time())}.json",
-                    #     mime="application/json",
-                    #     help="Скачать все результаты обработки в формате JSON",
-                    #     use_container_width=True
-                    # )
-                    #
-                    # # Опционально: кнопка для скачивания только структурированных данных
-                    # if result["extraction_result"]:
-                    #     structured_data = json.dumps(result["extraction_result"], indent=2, ensure_ascii=False)
-                    #     st.download_button(
-                    #         label="Скачать только извлеченные данные (JSON)",
-                    #         data=structured_data,
-                    #         file_name=f"resume_data_{int(time.time())}.json",
-                    #         mime="application/json",
-                    #         help="Скачать только структурированные данные резюме",
-                    #         use_container_width=True
-                    #     )
+
+                    st.markdown("---")
+                    st.subheader("📥 Скачать результаты")
+
+                    # Подготовка данных для скачивания
+                    full_results = {
+                        "metadata": {
+                            "processed_at": str(datetime.datetime.now()),
+                            "file_name": st.session_state.current_file_name,
+                            "file_size": f"{len(result['file_content'])} символов"
+                        },
+                        "validation": result["validation_result"],
+                        "extraction": result["extraction_result"]
+                    }
+
+                    # Конвертируем в JSON
+                    json_data = json.dumps(full_results, indent=2, ensure_ascii=False)
+
+                    # Кнопка для скачивания полных результатов
+                    st.download_button(
+                        label="Скачать полные результаты (JSON)",
+                        data=json_data,
+                        file_name=f"resume_results_{int(time.time())}.json",
+                        mime="application/json",
+                        help="Скачать все результаты обработки в формате JSON",
+                        use_container_width=True
+                    )
+
+                    # Опционально: кнопка для скачивания только структурированных данных
+                    if result["extraction_result"]:
+                        structured_data = json.dumps(result["extraction_result"], indent=2, ensure_ascii=False)
+                        st.download_button(
+                            label="Скачать только извлеченные данные (JSON)",
+                            data=structured_data,
+                            file_name=f"resume_data_{int(time.time())}.json",
+                            mime="application/json",
+                            help="Скачать только структурированные данные резюме",
+                            use_container_width=True
+                        )
 
                 # Если не резюме
                 elif result.get("validation_result") and not result["validation_result"]["is_resume"]:
@@ -226,6 +240,12 @@ def main():
     3. Если да, извлекает структурированную информацию
     4. Отображает извлеченные данные в удобном формате
     """)
+
+    # Добавляем кнопку для сброса и загрузки нового файла
+    # if st.sidebar.button("🔄 Загрузить новое резюме"):
+    #     st.session_state.current_file_name = None
+    #     st.session_state.processing_result = None
+    #     st.rerun()
 
 
 if __name__ == "__main__":
