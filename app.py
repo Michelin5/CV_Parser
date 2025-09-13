@@ -3,6 +3,9 @@ import os
 import tempfile
 from src.workflow import ResumeProcessingWorkflow
 import pprint
+import datetime
+import time
+import json
 
 
 def main():
@@ -97,11 +100,13 @@ def main():
 
                     # Личная информация
                     st.markdown("### 👤 Личная информация")
-                    col1, col2 = st.columns(2)
+                    col1, col2, col3 = st.columns(3)
                     with col1:
                         st.write("**Полное имя:**", extraction["full_name"] or "Не найдено")
                     with col2:
                         st.write("**Email:**", extraction["email"] or "Не найден")
+                    with col3:
+                        st.write("**Phone:**", extraction["phone_number"] or "Не найдено")
 
                     # Образование
                     if extraction["education"]:
@@ -165,6 +170,45 @@ def main():
                     if extraction["additional_information"]:
                         st.markdown("### ℹ️ Additional information")
                         st.write(extraction["additional_information"])
+                    #
+                    # st.markdown("---")
+                    # st.subheader("📥 Скачать результаты")
+                    #
+                    # # Подготовка данных для скачивания
+                    # full_results = {
+                    #     "metadata": {
+                    #         "processed_at": str(datetime.time()),
+                    #         "file_name": os.path.basename(file_path),
+                    #         "file_size": f"{len(result['file_content'])} символов"
+                    #     },
+                    #     "validation": result["validation_result"],
+                    #     "extraction": result["extraction_result"]
+                    # }
+                    #
+                    # # Конвертируем в JSON
+                    # json_data = json.dumps(full_results, indent=2, ensure_ascii=False)
+                    #
+                    # # Кнопка для скачивания полных результатов
+                    # st.download_button(
+                    #     label="Скачать полные результаты (JSON)",
+                    #     data=json_data,
+                    #     file_name=f"resume_results_{int(time.time())}.json",
+                    #     mime="application/json",
+                    #     help="Скачать все результаты обработки в формате JSON",
+                    #     use_container_width=True
+                    # )
+                    #
+                    # # Опционально: кнопка для скачивания только структурированных данных
+                    # if result["extraction_result"]:
+                    #     structured_data = json.dumps(result["extraction_result"], indent=2, ensure_ascii=False)
+                    #     st.download_button(
+                    #         label="Скачать только извлеченные данные (JSON)",
+                    #         data=structured_data,
+                    #         file_name=f"resume_data_{int(time.time())}.json",
+                    #         mime="application/json",
+                    #         help="Скачать только структурированные данные резюме",
+                    #         use_container_width=True
+                    #     )
 
                 # Если не резюме
                 elif result.get("validation_result") and not result["validation_result"]["is_resume"]:

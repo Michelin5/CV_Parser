@@ -103,6 +103,7 @@ def agent1_extractor(cv_text: str) -> Optional[Dict[str, Any]]:
     {
       "full_name": string | null,
       "email": string | null,
+      "phone_number": string | null,
       "education": [ { "degree": string | null, "field": string | null, "institution": string | null,
                        "start_date": "YYYY-MM" | "YYYY" | null, "end_date": "YYYY-MM" | "YYYY" | "present" | null,
                        "grade": string | null } , ... ] | null,
@@ -130,6 +131,7 @@ def agent1_extractor(cv_text: str) -> Optional[Dict[str, Any]]:
     {
       "full_name":"Jane Doe",
       "email":"jane@example.com",
+      "phone_number":null,
       "education":null,
       "employment_details":null,
       "projects":null,

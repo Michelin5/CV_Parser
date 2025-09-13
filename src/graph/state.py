@@ -53,6 +53,7 @@ class ResumeValidationResult(TypedDict):
 class ExtractedResumeData(TypedDict):
     full_name: Optional[str]
     email: Optional[str]
+    phone_number: Optional[str]
     education: Optional[List[EducationEntry]]
     employment_details: Optional[List[EmploymentDetail]]
     projects: Optional[List[Project]]
