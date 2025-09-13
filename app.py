@@ -17,7 +17,7 @@ def main():
 
     st.title("📄 Resume Parser")
     st.markdown("""
-    Загрузите ваше резюме (PDF или DOCX) и система извлечет ключевую информацию в структурированном формате.
+    Upload your resume (PDF or DOCX) and the system extracts the key information in a structured format.
     """)
 
     # Инициализация session state
@@ -28,9 +28,9 @@ def main():
 
     # Загрузка файла
     uploaded_file = st.file_uploader(
-        "Загрузите файл резюме",
+        "Upload resume file",
         type=["pdf", "docx", "doc"],
-        help="Поддерживаемые форматы: PDF, DOC, DOCX"
+        help="Supported extensions: PDF, DOC, DOCX"
     )
 
     # Проверяем, был ли загружен новый файл
@@ -41,7 +41,7 @@ def main():
             st.session_state.processing_result = None
 
             # Сохранение загруженного файла временно
-            with st.spinner("Обработка файла..."):
+            with st.spinner("File processing..."):
                 # Создаем временную директорию
                 os.makedirs("temp_uploads", exist_ok=True)
 
@@ -92,20 +92,20 @@ def main():
                    и укажите правильное имя модели (например, "qwen/qwen-2.5-72b-instruct")
                 """)
         else:
-            st.success("✅ Резюме успешно обработано!")
+            st.success("✅ The resume has been successfully processed!")
 
             # Показ результатов валидации
             if result.get("validation_result"):
                 validation = result["validation_result"]
-                st.subheader("🔍 Результаты валидации")
+                st.subheader("🔍 Validation result")
 
                 col1, col2 = st.columns(2)
                 with col1:
-                    st.markdown("### Это резюме?")
+                    st.markdown("### Is this a resume?")
                     if validation["is_resume"]:
-                        st.markdown(f"##### :green[ДА] (Уверенность в том, что файл - резюме: {validation['confidence']:.2f})")
+                        st.markdown(f"##### :green[YES] (Confidence score, that this file is a resume: {validation['confidence']:.2f})")
                     else:
-                        st.markdown(f"##### :red[НЕТ] (Уверенность в том, что файл резюме: {validation['confidence']:.2f})")
+                        st.markdown(f"##### :red[NO] (Confidence score, that this file is a resume: {validation['confidence']:.2f})")
                     # st.metric("Это резюме?", "Да" if validation["is_resume"] else "Нет",
                     #           delta=f"Уверенность, в том что файл - резюме: {validation['confidence']:.2f}")
                     # st.write(f"**Формат:** {validation['primary_format']}")
@@ -113,74 +113,74 @@ def main():
 
                 # Показ результатов извлечения, если это резюме
                 if result.get("extraction_result") and result.get("validation_result", {}).get("is_resume", False):
-                    st.subheader("📊 Извлеченная информация")
+                    st.subheader("📊 Extracted information")
 
                     extraction = result["extraction_result"]
 
                     # Личная информация
-                    st.markdown("### 👤 Личная информация")
+                    st.markdown("### 👤 Personal information")
                     col1, col2, col3 = st.columns(3)
                     with col1:
-                        st.write("**Полное имя:**", extraction["full_name"] or "Не найдено")
+                        st.write("**Full name:**", extraction["full_name"] or "Not found")
                     with col2:
-                        st.write("**Email:**", extraction["email"] or "Не найден")
+                        st.write("**Email:**", extraction["email"] or "Not found")
                     with col3:
-                        st.write("**Phone:**", extraction["phone_number"] or "Не найдено")
+                        st.write("**Phone:**", extraction["phone_number"] or "Not found")
 
                     # Образование
                     if extraction["education"]:
-                        st.markdown("### 🎓 Образование")
+                        st.markdown("### 🎓 Education")
                         for edu in extraction["education"]:
                             with st.expander(f"{edu['degree']} в {edu['field']}"):
-                                st.write("**Учебное заведение:**", edu["institution"] or "Не указано")
+                                st.write("**Institution:**", edu["institution"] or "Not stated")
                                 period = f"{edu['start_date']} - {edu['end_date']}"
-                                st.write("**Период:**", period)
+                                st.write("**Date:**", period)
                                 if edu["grade"]:
-                                    st.write("**Оценка/рейтинг:**", edu["grade"])
+                                    st.write("**Grade/GPA:**", edu["grade"])
 
                     # Опыт работы
                     if extraction["employment_details"]:
-                        st.markdown("### 💼 Опыт работы")
+                        st.markdown("### 💼 Working experience")
                         for emp in extraction["employment_details"]:
                             with st.expander(f"{emp['title']} в {emp['company']}"):
-                                st.write("**Местоположение:**", emp["location"] or "Не указано")
+                                st.write("**Location:**", emp["location"] or "Not stated")
                                 period = f"{emp['start_date']} - {emp['end_date']}"
-                                st.write("**Период:**", period)
-                                st.write("**Описание:**", emp["description"] or "Не указано")
+                                st.write("**Period:**", period)
+                                st.write("**Description:**", emp["description"] or "Not stated")
 
                     # Навыки
                     col1, col2 = st.columns(2)
 
                     with col1:
                         if extraction["technical_skills"]:
-                            st.markdown("### 🛠️ Технические навыки")
+                            st.markdown("### 🛠️ Technical skills")
                             for skill in extraction["technical_skills"]:
-                                st.write(f"**{skill['category'] or 'Другое'}**: {', '.join(skill['skills'])}")
+                                st.write(f"**{skill['category'] or 'Other'}**: {', '.join(skill['skills'])}")
 
                     with col2:
                         if extraction["languages"]:
-                            st.markdown("### 🌍 Языки")
+                            st.markdown("### 🌍 Languages")
                             for lang in extraction["languages"]:
-                                st.write(f"- **{lang['language']}**: {lang['proficiency'] or 'Уровень не указан'}")
+                                st.write(f"- **{lang['language']}**: {lang['proficiency'] or 'Proficiency not stated'}")
 
                     # Другие разделы
                     if extraction["projects"]:
-                        st.markdown("### 📂 Проекты")
+                        st.markdown("### 📂 Projects")
                         for project in extraction["projects"]:
-                            with st.expander(project["title"] or "Безымянный проект"):
-                                st.write("**Описание:**", project["description"] or "Не указано")
-                                st.write("**Технологии:**", ", ".join(project["technologies"]) if project[
-                                    "technologies"] else "Не указаны")
-                                st.write("**Период:**", project["period"] or "Не указан")
+                            with st.expander(project["title"] or "Unnamed project"):
+                                st.write("**Description:**", project["description"] or "Not stated")
+                                st.write("**Technologies:**", ", ".join(project["technologies"]) if project[
+                                    "technologies"] else "Not stated")
+                                st.write("**Period:**", project["period"] or "Not stated")
 
                     if extraction["publications"]:
-                        st.markdown("### 📚 Публикации")
+                        st.markdown("### 📚 Publications")
                         for pub in extraction["publications"]:
-                            with st.expander(pub["title"] or "Безымянная публикация"):
-                                st.write("**Источник:**", pub["venue"] or "Не указан")
-                                st.write("**Год:**", pub["year"] or "Не указан")
-                                st.write("**Авторы:**", ", ".join(pub["authors"]) if pub["authors"] else "Не указаны")
-                                st.write("**Ссылка:**", pub["link"] or "Не указана")
+                            with st.expander(pub["title"] or "Unnamed publication"):
+                                st.write("**Venue:**", pub["venue"] or "Not stated")
+                                st.write("**Year:**", pub["year"] or "Not stated")
+                                st.write("**Authors:**", ", ".join(pub["authors"]) if pub["authors"] else "Not stated")
+                                st.write("**Link:**", pub["link"] or "Not stated")
 
                     if extraction["soft_skills"]:
                         st.markdown("### 🤝 Soft skills")
@@ -191,7 +191,7 @@ def main():
                         st.write(extraction["additional_information"])
 
                     st.markdown("---")
-                    st.subheader("📥 Скачать результаты")
+                    st.subheader("📥 Download results")
 
                     # Подготовка данных для скачивания
                     # full_results = {
@@ -221,18 +221,18 @@ def main():
                     if result["extraction_result"]:
                         structured_data = json.dumps(result["extraction_result"], indent=2, ensure_ascii=False)
                         st.download_button(
-                            label="Скачать извлеченные данные (JSON)",
+                            label="Download extracted information (JSON)",
                             data=structured_data,
                             file_name=f"resume_data_{int(time.time())}.json",
                             mime="application/json",
-                            help="Скачать только структурированные данные резюме",
+                            help="Download only extracted information (JSON).",
                             use_container_width=True
                         )
 
                 # Если не резюме
                 elif result.get("validation_result") and not result["validation_result"]["is_resume"]:
-                    st.warning("⚠️ Загруженный документ не распознан как резюме/CV.")
-                    st.write("Пожалуйста, загрузите корректный документ резюме.")
+                    st.warning("⚠️ The uploaded document is not recognized as a resume/CV..")
+                    st.write("Please upload a valid resume document..")
 
     # Информация в сайдбаре
     st.sidebar.title("ℹ️ Информация")
