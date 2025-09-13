@@ -112,7 +112,6 @@ def agent1_extractor(cv_text: str) -> Optional[Dict[str, Any]]:
       "projects": [ { "title": string | null, "description": string | null, "technologies": [string,...] | null, "period": string | null } , ... ] | null,
       "publications": [ { "title": string | null, "venue": string | null, "year": "YYYY" | null, "authors": [string,...] | null, "link": string | null } , ... ] | null,
       "technical_skills": [ { "category": string | null, "skills": [string,...] } , ... ] | null,
-      "programming_languages": [ { "language": string, "proficiency": string | null } , ... ] | null,
       "languages": [ { "language": string, "proficiency": string | null } , ... ] | null,
       "soft_skills": [ string, ... ] | null,
       "additional_information": string | null
@@ -136,7 +135,6 @@ def agent1_extractor(cv_text: str) -> Optional[Dict[str, Any]]:
       "projects":null,
       "publications":null,
       "technical_skills":null,
-      "programming_languages":null,
       "languages":null,
       "soft_skills":null,
       "additional_information":null

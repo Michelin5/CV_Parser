@@ -72,22 +72,22 @@ def main():
                     col1, col2 = st.columns(2)
                     with col1:
                         st.metric("Это резюме?", "Да" if validation["is_resume"] else "Нет",
-                                  delta=f"Уверенность: {validation['confidence']:.2f}")
-                        st.write(f"**Формат:** {validation['primary_format']}")
-                        st.write(f"**Рекомендуемое действие:** {validation['suggested_action']}")
+                                  delta=f"Уверенность, в том что файл - резюме: {validation['confidence']:.2f}")
+                        # st.write(f"**Формат:** {validation['primary_format']}")
+                        # st.write(f"**Рекомендуемое действие:** {validation['suggested_action']}")
 
-                    with col2:
-                        st.write("**Обоснование:**")
-                        st.write(validation["explain"])
-
-                        st.write("**Пример фрагмента:**")
-                        st.text(validation["excerpt"])
+                    # with col2:
+                    #     st.write("**Обоснование:**")
+                    #     st.write(validation["explain"])
+                    #
+                    #     st.write("**Пример фрагмента:**")
+                    #     st.text(validation["excerpt"])
 
                     # Показ доказательств
-                    st.write("**Доказательства:**")
-                    for i, evidence in enumerate(validation["evidence"]):
-                        with st.expander(f"Доказательство #{i + 1} - {evidence['reason']}"):
-                            st.text(evidence["text_excerpt"])
+                    # st.write("**Доказательства:**")
+                    # for i, evidence in enumerate(validation["evidence"]):
+                    #     with st.expander(f"Доказательство #{i + 1} - {evidence['reason']}"):
+                    #         st.text(evidence["text_excerpt"])
 
                 # Показ результатов извлечения, если это резюме
                 if result.get("extraction_result") and result.get("validation_result", {}).get("is_resume", False):
@@ -125,21 +125,15 @@ def main():
                                 st.write("**Описание:**", emp["description"] or "Не указано")
 
                     # Навыки
-                    col1, col2, col3 = st.columns(3)
+                    col1, col2 = st.columns(2)
 
                     with col1:
-                        if extraction["programming_languages"]:
-                            st.markdown("### 💻 Языки программирования")
-                            for lang in extraction["programming_languages"]:
-                                st.write(f"- **{lang['language']}**: {lang['proficiency'] or 'Уровень не указан'}")
-
-                    with col2:
                         if extraction["technical_skills"]:
                             st.markdown("### 🛠️ Технические навыки")
                             for skill in extraction["technical_skills"]:
                                 st.write(f"**{skill['category'] or 'Другое'}**: {', '.join(skill['skills'])}")
 
-                    with col3:
+                    with col2:
                         if extraction["languages"]:
                             st.markdown("### 🌍 Языки")
                             for lang in extraction["languages"]:
