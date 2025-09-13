@@ -131,7 +131,7 @@ def main():
                     if extraction["education"]:
                         st.markdown("### 🎓 Education")
                         for edu in extraction["education"]:
-                            with st.expander(f"{edu['degree']} в {edu['field']}"):
+                            with st.expander(f"{edu['degree']} in {edu['field']}"):
                                 st.write("**Institution:**", edu["institution"] or "Not stated")
                                 period = f"{edu['start_date']} - {edu['end_date']}"
                                 st.write("**Date:**", period)
