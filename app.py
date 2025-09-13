@@ -231,8 +231,8 @@ def main():
 
                 # Если не резюме
                 elif result.get("validation_result") and not result["validation_result"]["is_resume"]:
-                    st.warning("⚠️ The uploaded document is not recognized as a resume/CV..")
-                    st.write("Please upload a valid resume document..")
+                    st.warning("⚠️ The uploaded document is not recognized as a resume/CV.")
+                    st.write("Please upload a valid resume document.")
 
     # Информация в сайдбаре
     st.sidebar.title("ℹ️ Информация")

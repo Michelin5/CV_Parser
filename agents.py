@@ -4,15 +4,6 @@ from typing import Dict, Any, Optional
 
 
 def agent0_validator(cv_text: str) -> Optional[Dict[str, Any]]:
-    """
-    Validates if the provided text is a resume/CV.
-
-    Args:
-        cv_text: Text to validate
-
-    Returns:
-        Validation result as dictionary or None if error
-    """
     system_prompt = """
     You are an accuracy-focused classifier whose single task is: decide whether the provided text is a Resume / CV.
 
@@ -79,15 +70,6 @@ def agent0_validator(cv_text: str) -> Optional[Dict[str, Any]]:
 
 
 def agent1_extractor(cv_text: str) -> Optional[Dict[str, Any]]:
-    """
-    Extracts structured data from a resume/CV.
-
-    Args:
-        cv_text: Text of the resume to extract from
-
-    Returns:
-        Extracted data as dictionary or None if error
-    """
     system_prompt = """
     You are a specialist Resume/CV extraction agent. Input: a resume or CV as plain text (or OCR text). Output: a single machine-parsable JSON object and nothing else.
 

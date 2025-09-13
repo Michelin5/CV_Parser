@@ -6,10 +6,8 @@ from src.graph.state import AgentState
 def should_continue(state):
     """
     Determines whether to continue to the extractor node or end the workflow.
-
     Args:
         state: The current state of the graph
-
     Returns:
         The next node to execute
     """
@@ -24,7 +22,6 @@ def should_continue(state):
 def create_workflow():
     """
     Creates and compiles the LangGraph workflow for resume processing.
-
     Returns:
         Compiled workflow
     """
