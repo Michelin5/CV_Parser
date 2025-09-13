@@ -2,6 +2,7 @@ import streamlit as st
 import os
 import tempfile
 from src.workflow import ResumeProcessingWorkflow
+import pprint
 
 
 def main():
@@ -37,6 +38,8 @@ def main():
             # Обрабатываем резюме
             workflow = ResumeProcessingWorkflow()
             result = workflow.process_resume(file_path)
+
+            pprint.pprint(result)
 
             # Очистка
             os.remove(file_path)
