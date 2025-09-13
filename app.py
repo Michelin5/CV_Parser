@@ -101,8 +101,13 @@ def main():
 
                 col1, col2 = st.columns(2)
                 with col1:
-                    st.metric("Это резюме?", "Да" if validation["is_resume"] else "Нет",
-                              delta=f"Уверенность, в том что файл - резюме: {validation['confidence']:.2f}")
+                    st.markdown("### Это резюме?")
+                    if validation["is_resume"]:
+                        st.markdown(f"##### :green[ДА] (Уверенность в том, что файл - резюме: {validation['confidence']:.2f})")
+                    else:
+                        st.markdown(f"##### :red[НЕТ] (Уверенность в том, что файл резюме: {validation['confidence']:.2f})")
+                    # st.metric("Это резюме?", "Да" if validation["is_resume"] else "Нет",
+                    #           delta=f"Уверенность, в том что файл - резюме: {validation['confidence']:.2f}")
                     # st.write(f"**Формат:** {validation['primary_format']}")
                     # st.write(f"**Рекомендуемое действие:** {validation['suggested_action']}")
 
