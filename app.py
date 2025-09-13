@@ -194,34 +194,34 @@ def main():
                     st.subheader("📥 Скачать результаты")
 
                     # Подготовка данных для скачивания
-                    full_results = {
-                        "metadata": {
-                            "processed_at": str(datetime.datetime.now()),
-                            "file_name": st.session_state.current_file_name,
-                            "file_size": f"{len(result['file_content'])} символов"
-                        },
-                        "validation": result["validation_result"],
-                        "extraction": result["extraction_result"]
-                    }
-
-                    # Конвертируем в JSON
-                    json_data = json.dumps(full_results, indent=2, ensure_ascii=False)
-
-                    # Кнопка для скачивания полных результатов
-                    st.download_button(
-                        label="Скачать полные результаты (JSON)",
-                        data=json_data,
-                        file_name=f"resume_results_{int(time.time())}.json",
-                        mime="application/json",
-                        help="Скачать все результаты обработки в формате JSON",
-                        use_container_width=True
-                    )
+                    # full_results = {
+                    #     "metadata": {
+                    #         "processed_at": str(datetime.datetime.now()),
+                    #         "file_name": st.session_state.current_file_name,
+                    #         "file_size": f"{len(result['file_content'])} символов"
+                    #     },
+                    #     "validation": result["validation_result"],
+                    #     "extraction": result["extraction_result"]
+                    # }
+                    #
+                    # # Конвертируем в JSON
+                    # json_data = json.dumps(full_results, indent=2, ensure_ascii=False)
+                    #
+                    # # Кнопка для скачивания полных результатов
+                    # st.download_button(
+                    #     label="Скачать полные результаты (JSON)",
+                    #     data=json_data,
+                    #     file_name=f"resume_results_{int(time.time())}.json",
+                    #     mime="application/json",
+                    #     help="Скачать все результаты обработки в формате JSON",
+                    #     use_container_width=True
+                    # )
 
                     # Опционально: кнопка для скачивания только структурированных данных
                     if result["extraction_result"]:
                         structured_data = json.dumps(result["extraction_result"], indent=2, ensure_ascii=False)
                         st.download_button(
-                            label="Скачать только извлеченные данные (JSON)",
+                            label="Скачать извлеченные данные (JSON)",
                             data=structured_data,
                             file_name=f"resume_data_{int(time.time())}.json",
                             mime="application/json",
