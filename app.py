@@ -190,32 +190,13 @@ def main():
                         st.markdown("### ℹ️ Additional information")
                         st.write(extraction["additional_information"])
 
+                    # Краткий пересказ резюме
+                    if result.get("summary"):
+                        st.markdown("### 📝 Resume Summary")
+                        st.write(result["summary"])
+
                     st.markdown("---")
                     st.subheader("📥 Download results")
-
-                    # Подготовка данных для скачивания
-                    # full_results = {
-                    #     "metadata": {
-                    #         "processed_at": str(datetime.datetime.now()),
-                    #         "file_name": st.session_state.current_file_name,
-                    #         "file_size": f"{len(result['file_content'])} символов"
-                    #     },
-                    #     "validation": result["validation_result"],
-                    #     "extraction": result["extraction_result"]
-                    # }
-                    #
-                    # # Конвертируем в JSON
-                    # json_data = json.dumps(full_results, indent=2, ensure_ascii=False)
-                    #
-                    # # Кнопка для скачивания полных результатов
-                    # st.download_button(
-                    #     label="Скачать полные результаты (JSON)",
-                    #     data=json_data,
-                    #     file_name=f"resume_results_{int(time.time())}.json",
-                    #     mime="application/json",
-                    #     help="Скачать все результаты обработки в формате JSON",
-                    #     use_container_width=True
-                    # )
 
                     # Опционально: кнопка для скачивания только структурированных данных
                     if result["extraction_result"]:

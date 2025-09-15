@@ -147,3 +147,39 @@ def agent1_extractor(cv_text: str) -> Optional[Dict[str, Any]]:
             "error": f"Extraction failed: {str(e)}",
             "raw_response": response
         }
+
+
+def agent2_summarizer(cv_text: str) -> Optional[str]:
+    system_prompt = """
+    You are a resume summarization agent. Input: a resume or CV as plain text. Output: a single machine-parsable JSON object with a brief summary.
+
+    OUTPUT RULES
+    - Return ONLY valid JSON (no prose, no Markdown, no explanations).
+    - The top-level object MUST contain only this key: summary
+    - The summary should be a concise retelling of the resume in 2-3 sentences, highlighting key experiences, education, skills, and achievements.
+    - Keep the summary under 50 words.
+    - Do NOT hallucinate or invent details. Base it strictly on the provided text.
+
+    SCHEMA
+    {
+      "summary": "string (2-3 sentences, concise retelling)"
+    }
+
+    Process the provided resume text and return the JSON exactly following these rules.
+    """
+
+    response = call_qwen(user_prompt=cv_text, system_instruction=system_prompt)
+
+    try:
+        clean_response = response.strip()
+        if clean_response.startswith('```json'):
+            clean_response = clean_response[7:-3].strip()
+        elif clean_response.startswith('```'):
+            clean_response = clean_response[3:-3].strip()
+
+        parsed = json.loads(clean_response)
+        return parsed.get("summary", None)
+    except json.JSONDecodeError:
+        return None
+    except Exception as e:
+        return None

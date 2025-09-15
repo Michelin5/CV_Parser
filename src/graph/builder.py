@@ -1,5 +1,5 @@
 from langgraph.graph import StateGraph, END
-from agents import agent0_validator, agent1_extractor
+from agents import agent0_validator, agent1_extractor, agent2_summarizer
 from src.graph.state import AgentState
 
 
@@ -31,6 +31,7 @@ def create_workflow():
     # Add nodes
     workflow.add_node("validator", lambda state: {"validation_result": agent0_validator(state["file_content"])})
     workflow.add_node("extractor", lambda state: {"extraction_result": agent1_extractor(state["file_content"])})
+    workflow.add_node("summarizer", lambda state: {"summary": agent2_summarizer(state["file_content"])})
 
     # Set entry point
     workflow.set_entry_point("validator")
@@ -45,8 +46,11 @@ def create_workflow():
         }
     )
 
-    # Add edge from extractor to end
-    workflow.add_edge("extractor", END)
+    # Add edge from extractor to summarizer
+    workflow.add_edge("extractor", "summarizer")
+
+    # Add edge from summarizer to end
+    workflow.add_edge("summarizer", END)
 
     # Compile the graph
     return workflow.compile()

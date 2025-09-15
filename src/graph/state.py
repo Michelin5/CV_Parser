@@ -70,5 +70,6 @@ class AgentState(TypedDict):
     file_links: Optional[List[str]]
     validation_result: Optional[ResumeValidationResult]
     extraction_result: Optional[ExtractedResumeData]
+    summary: Optional[str]
     error: Optional[str]
     status: Literal["initialized", "parsing", "validating", "extracting", "completed", "failed"]
