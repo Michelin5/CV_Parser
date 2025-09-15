@@ -14,7 +14,7 @@ class FileParser:
 
         if file_extension == '.pdf':
             self._parse_pdf(file_path)
-        elif file_extension in ['.docx', '.doc']:
+        elif file_extension in ['.docx']:
             self._parse_docx(file_path)
         else:
             raise ValueError(f"Unsupported file format: {file_extension}")
