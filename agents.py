@@ -1,6 +1,6 @@
 from llmclient import call_qwen
 import json
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 
 def agent0_validator(cv_text: str) -> Optional[Dict[str, Any]]:
@@ -156,13 +156,13 @@ def agent2_summarizer(cv_text: str) -> Optional[str]:
     OUTPUT RULES
     - Return ONLY valid JSON (no prose, no Markdown, no explanations).
     - The top-level object MUST contain only this key: summary
-    - The summary should be a concise retelling of the resume in 2-3 sentences, highlighting key experiences, education, skills, and achievements.
-    - Keep the summary under 50 words.
+    - The summary should be a concise retelling of the resume in 3-5 sentences, highlighting key experiences, education, skills, and achievements.
+    - Keep the summary under 200 words.
     - Do NOT hallucinate or invent details. Base it strictly on the provided text.
 
     SCHEMA
     {
-      "summary": "string (2-3 sentences, concise retelling)"
+      "summary": "string (3-5 sentences, concise retelling)"
     }
 
     Process the provided resume text and return the JSON exactly following these rules.
@@ -183,3 +183,20 @@ def agent2_summarizer(cv_text: str) -> Optional[str]:
         return None
     except Exception as e:
         return None
+
+
+def custom_summarizer(cv_text: str, parameters: List[str]) -> Optional[str]:
+    param_str = ", ".join(parameters)
+    system_prompt = f"""
+    You are a resume retelling agent. Generate a brief retelling in English, focusing ONLY on the specified parameters: {param_str}.
+
+    Output rules:
+    - Output ONLY the retelling text, without JSON, without extra text.
+    - Format: SUMMARY ({param_str}): "your retelling here"
+    - Keep it brief, 1-2 sentences.
+    - Do not hallucinate or invent details. Base strictly on the provided resume text.
+    """
+
+    response = call_qwen(user_prompt=cv_text, system_instruction=system_prompt)
+
+    return response.strip() if response else None

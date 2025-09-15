@@ -2,6 +2,7 @@ import streamlit as st
 import os
 import tempfile
 from src.workflow import ResumeProcessingWorkflow
+from agents import custom_summarizer
 import pprint
 import datetime
 import time
@@ -25,6 +26,8 @@ def main():
         st.session_state.processing_result = None
     if 'current_file_name' not in st.session_state:
         st.session_state.current_file_name = None
+    if 'custom_summary' not in st.session_state:
+        st.session_state.custom_summary = None
 
     # Загрузка файла
     uploaded_file = st.file_uploader(
@@ -39,6 +42,7 @@ def main():
         if st.session_state.current_file_name != uploaded_file.name:
             st.session_state.current_file_name = uploaded_file.name
             st.session_state.processing_result = None
+            st.session_state.custom_summary = None
 
             # Сохранение загруженного файла временно
             with st.spinner("File processing..."):
@@ -69,6 +73,7 @@ def main():
         # Сбрасываем состояние при удалении файла
         st.session_state.current_file_name = None
         st.session_state.processing_result = None
+        st.session_state.custom_summary = None
 
     # Отображаем результаты, если они есть
     if st.session_state.processing_result is not None:
@@ -103,9 +108,11 @@ def main():
                 with col1:
                     st.markdown("### Is this a resume?")
                     if validation["is_resume"]:
-                        st.markdown(f"##### :green[YES] (Confidence score, that this file is a resume: {validation['confidence']:.2f})")
+                        st.markdown(
+                            f"##### :green[YES] (Confidence score, that this file is a resume: {validation['confidence']:.2f})")
                     else:
-                        st.markdown(f"##### :red[NO] (Confidence score, that this file is a resume: {validation['confidence']:.2f})")
+                        st.markdown(
+                            f"##### :red[NO] (Confidence score, that this file is a resume: {validation['confidence']:.2f})")
                     # st.metric("Это резюме?", "Да" if validation["is_resume"] else "Нет",
                     #           delta=f"Уверенность, в том что файл - резюме: {validation['confidence']:.2f}")
                     # st.write(f"**Формат:** {validation['primary_format']}")
@@ -194,6 +201,52 @@ def main():
                     if result.get("summary"):
                         st.markdown("### 📝 Resume Summary")
                         st.write(result["summary"])
+
+                    # Custom Summary section
+                    st.markdown("### 🔧 Custom Summary by Parameters")
+                    fixed_params = ['experience', 'skills', 'education', 'pros', 'cons', 'projects', 'languages',
+                                    'soft_skills', 'certifications']
+                    st.info(f"Available parameters: {', '.join(fixed_params)}")
+                    params_input = st.text_input(
+                        "Enter key parameters (comma-separated):",
+                        placeholder="experience, skills, education"
+                    )
+                    col1, col2 = st.columns(2)
+                    generate_btn = col1.button("Generate Custom Summary")
+                    clear_btn = col2.button("Clear Summary")
+
+                    if clear_btn:
+                        st.session_state.custom_summary = None
+                        st.rerun()
+
+                    if generate_btn and params_input.strip():
+                        raw_parts = params_input.split(",")
+                        parameters = [p.strip().lower() for p in raw_parts if p.strip()]
+
+                        if not parameters:
+                            st.warning(
+                                "Incorrect format: No valid parameters entered. Please separate parameters with commas.")
+                        else:
+                            invalid_params = [p for p in parameters if p not in fixed_params]
+                            if invalid_params:
+                                st.warning(
+                                    f"Invalid parameters: {', '.join(invalid_params)}. Please use only from the available list.")
+                            elif result.get("file_content"):
+                                with st.spinner("Generating custom summary..."):
+                                    custom_summary = custom_summarizer(result["file_content"], parameters)
+                                    if custom_summary:
+                                        st.session_state.custom_summary = custom_summary
+                                    else:
+                                        st.session_state.custom_summary = None
+                                        st.error("Failed to generate custom summary.")
+                            else:
+                                st.warning("No resume content available for summarization.")
+                        st.rerun()
+
+                    # Display the custom summary if it exists
+                    if st.session_state.custom_summary:
+                        st.markdown("#### Generated Summary")
+                        st.write(st.session_state.custom_summary)
 
                     st.markdown("---")
                     st.subheader("📥 Download results")
