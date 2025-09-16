@@ -128,14 +128,14 @@ def main():
                     st.markdown("### 👤 Personal information")
                     col1, col2, col3 = st.columns(3)
                     with col1:
-                        st.write("**Full name:**", extraction["full_name"] or "Not found")
+                        st.write("**Full name:**", extraction.get("full_name", "Not found"))
                     with col2:
-                        st.write("**Email:**", extraction["email"] or "Not found")
+                        st.write("**Email:**", extraction.get("email", "Not found"))
                     with col3:
-                        st.write("**Phone:**", extraction["phone_number"] or "Not found")
+                        st.write("**Phone:**", extraction.get("phone_number", "Not found"))
 
                     # Образование
-                    if extraction["education"]:
+                    if extraction.get("education"):
                         st.markdown("### 🎓 Education")
                         for edu in extraction["education"]:
                             with st.expander(f"{edu['degree']} in {edu['field']}"):
@@ -146,7 +146,7 @@ def main():
                                     st.write("**Grade/GPA:**", edu["grade"])
 
                     # Опыт работы
-                    if extraction["employment_details"]:
+                    if extraction.get("employment_details"):
                         st.markdown("### 💼 Working experience")
                         for emp in extraction["employment_details"]:
                             with st.expander(f"{emp['title']} в {emp['company']}"):
@@ -159,19 +159,19 @@ def main():
                     col1, col2 = st.columns(2)
 
                     with col1:
-                        if extraction["technical_skills"]:
+                        if extraction.get("technical_skills"):
                             st.markdown("### 🛠️ Technical skills")
                             for skill in extraction["technical_skills"]:
                                 st.write(f"**{skill['category'] or 'Other'}**: {', '.join(skill['skills'])}")
 
                     with col2:
-                        if extraction["languages"]:
+                        if extraction.get("languages"):
                             st.markdown("### 🌍 Languages")
                             for lang in extraction["languages"]:
                                 st.write(f"- **{lang['language']}**: {lang['proficiency'] or 'Proficiency not stated'}")
 
                     # Другие разделы
-                    if extraction["projects"]:
+                    if extraction.get("projects"):
                         st.markdown("### 📂 Projects")
                         for project in extraction["projects"]:
                             with st.expander(project["title"] or "Unnamed project"):
@@ -180,7 +180,7 @@ def main():
                                     "technologies"] else "Not stated")
                                 st.write("**Period:**", project["period"] or "Not stated")
 
-                    if extraction["publications"]:
+                    if extraction.get("publications"):
                         st.markdown("### 📚 Publications")
                         for pub in extraction["publications"]:
                             with st.expander(pub["title"] or "Unnamed publication"):
@@ -189,11 +189,11 @@ def main():
                                 st.write("**Authors:**", ", ".join(pub["authors"]) if pub["authors"] else "Not stated")
                                 st.write("**Link:**", pub["link"] or "Not stated")
 
-                    if extraction["soft_skills"]:
+                    if extraction.get("soft_skills"):
                         st.markdown("### 🤝 Soft skills")
                         st.write(", ".join(extraction["soft_skills"]))
 
-                    if extraction["additional_information"]:
+                    if extraction.get("additional_information"):
                         st.markdown("### ℹ️ Additional information")
                         st.write(extraction["additional_information"])
 
@@ -252,7 +252,7 @@ def main():
                     st.subheader("📥 Download results")
 
                     # Опционально: кнопка для скачивания только структурированных данных
-                    if result["extraction_result"]:
+                    if result.get("extraction_result"):
                         structured_data = json.dumps(result["extraction_result"], indent=2, ensure_ascii=False)
                         st.download_button(
                             label="Download extracted information (JSON)",
