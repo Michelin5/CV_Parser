@@ -104,6 +104,7 @@ def agent1_extractor(cv_text: str) -> Optional[Dict[str, Any]]:
     - Dates: normalize to "YYYY-MM" when month known, otherwise "YYYY". Use "present" for ongoing roles.
     - Degrees: normalize common abbreviations when obvious (e.g., "BSc" -> "Bachelor of Science"); if uncertain, return the original short form.
     - Email: accept only valid email format; otherwise set email to null.
+    - Phone number: Consider all possible phone number formats of all countries.
     - Deduplicate equivalent skills and standardize common category names (e.g., "Databases", "Cloud", "Frameworks"); if unsure, set category to null.
     - Condense multi-line descriptions to 1–2 concise sentences.
     - Do NOT hallucinate or invent details. If you cannot confidently extract a field, return null for that field or section.
