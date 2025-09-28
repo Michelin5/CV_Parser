@@ -138,7 +138,7 @@ def main():
                     if extraction.get("education"):
                         st.markdown("### 🎓 Education")
                         for edu in extraction["education"]:
-                            with st.expander(f"{edu['degree']} in {edu['field']}"):
+                            with st.expander(f"{edu['degree']}"):
                                 st.write("**Institution:**", edu["institution"] or "Not stated")
                                 period = f"{edu['start_date']} - {edu['end_date']}"
                                 st.write("**Date:**", period)
@@ -149,7 +149,7 @@ def main():
                     if extraction.get("employment_details"):
                         st.markdown("### 💼 Working experience")
                         for emp in extraction["employment_details"]:
-                            with st.expander(f"{emp['title']} в {emp['company']}"):
+                            with st.expander(f"{emp['title']} in {emp['company']}"):
                                 st.write("**Location:**", emp["location"] or "Not stated")
                                 period = f"{emp['start_date']} - {emp['end_date']}"
                                 st.write("**Period:**", period)
